@@ -97,7 +97,12 @@ public class SecurityConfig {
             // Add JWT filter BEFORE Spring's default auth filter
             // THREAD: JwtAuthFilter runs on the same Tomcat thread,
             // setting ThreadLocal SecurityContext before controller execution
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            // Relax COOP/COEP for Google Login to work without freezing
+            .headers(headers -> headers
+                .crossOriginOpenerPolicy(coop -> coop.policy(org.springframework.security.web.header.writers.CrossOriginOpenerPolicyHeaderWriter.CrossOriginOpenerPolicy.SAME_ORIGIN_ALLOW_POPUPS))
+                .crossOriginEmbedderPolicy(coep -> coep.policy(org.springframework.security.web.header.writers.CrossOriginEmbedderPolicyHeaderWriter.CrossOriginEmbedderPolicy.UNSAFE_NONE))
+            );
 
         return http.build();
     }
