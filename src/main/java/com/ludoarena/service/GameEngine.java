@@ -1,6 +1,5 @@
 package com.ludoarena.service;
 
-import com.ludoarena.dto.GameDTO;
 import com.ludoarena.dto.MoveDTO;
 import com.ludoarena.model.*;
 import com.ludoarena.repository.*;
@@ -39,6 +38,7 @@ public class GameEngine {
     private final MoveRepository moveRepository;
     private final GameScoreRepository gameScoreRepository;
     private final GameService gameService;
+    private final UserRepository userRepository;
 
     private static final int TRACK_SIZE = 52;
     private static final SecureRandom RANDOM = new SecureRandom();
@@ -47,12 +47,14 @@ public class GameEngine {
                       PlayerGameRepository playerGameRepository,
                       MoveRepository moveRepository,
                       GameScoreRepository gameScoreRepository,
-                      GameService gameService) {
+                      GameService gameService,
+                      UserRepository userRepository) {
         this.gameRepository = gameRepository;
         this.playerGameRepository = playerGameRepository;
         this.moveRepository = moveRepository;
         this.gameScoreRepository = gameScoreRepository;
         this.gameService = gameService;
+        this.userRepository = userRepository;
     }
 
     @jakarta.annotation.PostConstruct
@@ -150,6 +152,7 @@ public class GameEngine {
             if (prizePool > 0) {
                 User user = currentPlayer.getUser();
                 user.setCoins(user.getCoins() + prizePool);
+                userRepository.save(user); // Persist coin gain
             }
 
             // Record scores for all players (ported from LudoMaster)
@@ -452,6 +455,7 @@ public class GameEngine {
             if (isWinner) {
                 u.setGamesWon(u.getGamesWon() + 1);
             }
+            userRepository.save(u); // Persist win/loss stats
         }
     }
     
