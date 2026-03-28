@@ -11,6 +11,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class FeedbackService {
@@ -33,20 +34,22 @@ public class FeedbackService {
         
         Feedback savedFeedback = feedbackRepository.save(feedback);
         
-        // Send email notification to admin
-        try {
-            if (mailSender != null) {
-                SimpleMailMessage message = new SimpleMailMessage();
-                message.setTo(adminEmail);
-                message.setSubject("New LudoArena Feedback: " + rating + " Stars");
-                message.setText("Player: " + user.getName() + " (" + user.getEmail() + ")\n" +
-                               "Rating: " + rating + "/5\n" +
-                               "Comment: " + comment + "\n" +
-                               "Time: " + savedFeedback.getCreatedAt());
-                mailSender.send(message);
-            }
-        } catch (Exception e) {
-            System.err.println("Failed to send feedback email: " + e.getMessage());
+        // Send email notification to admin asynchronously to avoid blocking
+        if (mailSender != null) {
+            CompletableFuture.runAsync(() -> {
+                try {
+                    SimpleMailMessage message = new SimpleMailMessage();
+                    message.setTo(adminEmail);
+                    message.setSubject("New LudoArena Feedback: " + rating + " Stars");
+                    message.setText("Player: " + user.getName() + " (" + (user.getEmail() != null ? user.getEmail() : "Guest") + ")\n" +
+                                   "Rating: " + rating + "/5\n" +
+                                   "Comment: " + comment + "\n" +
+                                   "Time: " + savedFeedback.getCreatedAt());
+                    mailSender.send(message);
+                } catch (Exception e) {
+                    System.err.println("Failed to send feedback email: " + e.getMessage());
+                }
+            });
         }
         
         return savedFeedback;

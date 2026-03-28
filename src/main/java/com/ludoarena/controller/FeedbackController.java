@@ -2,7 +2,6 @@ package com.ludoarena.controller;
 
 import com.ludoarena.model.Feedback;
 import com.ludoarena.model.User;
-import com.ludoarena.repository.UserRepository;
 import com.ludoarena.service.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
