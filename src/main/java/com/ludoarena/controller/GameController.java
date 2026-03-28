@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  *   GET  /api/games/{id}              → Get game state (protected)
  */
 @RestController
-@RequestMapping("/api/game")
+@RequestMapping("/api/games")
 public class GameController {
 
     private final GameService gameService;
