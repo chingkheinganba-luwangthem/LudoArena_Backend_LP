@@ -20,8 +20,7 @@ import org.springframework.web.bind.annotation.*;
  *   GET  /api/games/{id}              → Get game state (protected)
  */
 @RestController
-@RequestMapping("/api/games")
-@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/api/game")
 public class GameController {
 
     private final GameService gameService;
