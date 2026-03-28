@@ -33,7 +33,8 @@ public class FeedbackController {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        int rating = (int) payload.getOrDefault("rating", 0);
+        Object ratingObj = payload.getOrDefault("rating", 0);
+        int rating = (ratingObj instanceof Number) ? ((Number) ratingObj).intValue() : 0;
         String comment = (String) payload.getOrDefault("comment", "");
 
         if (rating < 1 || rating > 5) {
