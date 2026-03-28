@@ -6,7 +6,7 @@ import com.ludoarena.repository.UserRepository;
 import com.ludoarena.service.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -20,18 +20,11 @@ public class FeedbackController {
     @Autowired
     private FeedbackService feedbackService;
 
-    @Autowired
-    private UserRepository userRepository;
-
     @PostMapping
-    public ResponseEntity<?> submitFeedback(Authentication authentication, @RequestBody Map<String, Object> payload) {
-        if (authentication == null) {
+    public ResponseEntity<?> submitFeedback(@AuthenticationPrincipal User user, @RequestBody Map<String, Object> payload) {
+        if (user == null) {
             return ResponseEntity.status(401).body("User not authenticated");
         }
-
-        String userEmail = authentication.getName();
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
 
         Object ratingObj = payload.getOrDefault("rating", 0);
         int rating = (ratingObj instanceof Number) ? ((Number) ratingObj).intValue() : 0;
